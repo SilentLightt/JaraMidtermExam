@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -14,19 +15,21 @@ public class EnemyAI : MonoBehaviour
     private bool hasAttacked = false; // Cooldown flag for attack
     private Enemy enemyScript; // Reference to the Enemy script
     public StatModifier statModifier; // Reference to StatModifier for enemy stats
+    public Transform damageTextSpawnPoint; // Assign this to the desired location on the enemy, e.g., head or chest
+    public TextMeshProUGUI healthText; // Reference to TextMeshPro component for displaying health
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
 
-        // Get reference to the Enemy script on this GameObject
-        enemyScript = GetComponent<Enemy>();
-
-        // Initialize health from StatModifier
+        // Initialize stats from StatModifier
         if (statModifier != null)
         {
-            statModifier.ResetStats(); // Ensure stats are reset
+            statModifier.ResetStats(); // Ensure stats are reset, including health
         }
+
+        // Get reference to the Enemy script on this GameObject
+        enemyScript = GetComponent<Enemy>();
 
         // Find the player in the scene
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -34,11 +37,18 @@ public class EnemyAI : MonoBehaviour
         {
             Target = player.transform;
         }
+
+        UpdateHealthText(); // Initial health display
     }
 
     void Update()
     {
         FollowTarget();
+    }
+
+    public Transform GetDamageTextSpawnPoint()
+    {
+        return damageTextSpawnPoint; // Return the assigned spawn point
     }
 
     public void FollowTarget()
@@ -48,37 +58,30 @@ public class EnemyAI : MonoBehaviour
 
         if (distanceToPlayer <= detectionRange && distanceToPlayer > attackRange)
         {
-            // Follow the player if within detection range but outside attack range
             agent.SetDestination(Target.position);
             animator.SetTrigger("Run"); // Trigger Running state
-
-            // Rotate to face the player
             RotateTowards(Target.position);
         }
         else if (distanceToPlayer <= attackRange && !hasAttacked)
         {
-            // Attack the player if within attack range and hasn't attacked yet
             AttackPlayer();
             RotateTowards(Target.position); // Ensure rotation towards the player when attacking
         }
         else if (distanceToPlayer > attackRange)
         {
-            // Stop attacking and follow or idle when out of attack range
             StopAttacking();
             agent.velocity = Vector3.zero;
 
-            // Continue following if within detection range but outside attack range
             if (distanceToPlayer <= detectionRange)
             {
                 agent.SetDestination(Target.position);
-                animator.SetTrigger("Run"); // Trigger Running state
+                animator.SetTrigger("Run");
                 RotateTowards(Target.position);
             }
             else
             {
-                // Stop moving when outside detection range
                 agent.ResetPath();
-                animator.SetTrigger("Idle"); // Trigger Idle state
+                animator.SetTrigger("Idle");
                 agent.velocity = Vector3.zero;
             }
         }
@@ -86,18 +89,16 @@ public class EnemyAI : MonoBehaviour
 
     private void RotateTowards(Vector3 targetPosition)
     {
-        Vector3 direction = (targetPosition - transform.position).normalized; // Calculate direction towards the player
-        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z)); // Create a rotation that only affects the Y-axis
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f); // Smoothly rotate towards the target
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
     }
 
     public void AttackPlayer()
     {
-        hasAttacked = true; // Set attack cooldown
-        animator.SetTrigger("Attack"); // Trigger Attacking state
-
-        // Apply attack cooldown
-        Invoke(nameof(ResetAttack), 1.0f); // Adjust cooldown duration as needed
+        hasAttacked = true;
+        animator.SetTrigger("Attack");
+        Invoke(nameof(ResetAttack), 1.0f);
     }
 
     private void ResetAttack()
@@ -107,8 +108,8 @@ public class EnemyAI : MonoBehaviour
 
     public void StopAttacking()
     {
-        hasAttacked = false; // Reset the cooldown flag
-        animator.SetTrigger("Idle"); // Trigger Idle state
+        hasAttacked = false;
+        animator.SetTrigger("Idle");
         agent.velocity = Vector3.zero;
     }
 
@@ -120,6 +121,8 @@ public class EnemyAI : MonoBehaviour
             statModifier.currentHP -= damage;
             animator.SetTrigger("Hurt");
 
+            UpdateHealthText(); // Update health display on taking damage
+
             if (statModifier.currentHP <= 0)
             {
                 Die();
@@ -127,12 +130,19 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    private void UpdateHealthText()
+    {
+        if (healthText != null && statModifier != null)
+        {
+            healthText.text = $"HP: {statModifier.currentHP} / {statModifier.baseHP}";
+        }
+    }
+
     private void Die()
     {
-        // Trigger death animation and disable AI behavior
         animator.SetTrigger("Die");
         agent.isStopped = true;
-        this.enabled = false; // Disable this script
+        this.enabled = false;
         Destroy(gameObject, 3f); // Delays destruction to allow death animation to play
     }
 

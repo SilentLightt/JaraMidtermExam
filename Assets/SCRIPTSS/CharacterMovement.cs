@@ -170,6 +170,8 @@ public class CharacterMovement : MonoBehaviour
     private Vector3 velocity;
     private bool isJumping = false;
     private bool jumpInitiated = false;
+    private int currentAttackIndex = 0; // Track which attack animation to play
+    private bool isAttacking = false;   // Flag to prevent spamming attacks
 
     void Start()
     {
@@ -180,38 +182,33 @@ public class CharacterMovement : MonoBehaviour
     {
         HandleMovementInput();
         ApplyGravity();
+        HandleAttackInput(); // New method for attack input
     }
 
     void HandleMovementInput()
     {
-        // Check if character is walking or running
+        // Movement and running logic (unchanged)
         bool isWalking = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) ||
                          Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
         bool isRunning = isWalking && Input.GetKey(KeyCode.LeftShift);
         bool jumpPressed = Input.GetKeyDown(KeyCode.Space) && controller.isGrounded && !jumpInitiated;
 
-        // Start jump coroutine if space is pressed and the player is grounded
         if (jumpPressed)
         {
             jumpInitiated = true;
             StartCoroutine(JumpWithDelay());
         }
 
-        // Adjust speed for running if shift is held
         float speedMultiplier = isRunning ? 1.5f : 1f;
         Vector3 moveDirection = Vector3.zero;
 
-        // Get input and convert it relative to camera direction
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
-
-        // Flatten the forward and right vectors on the Y-axis
         forward.y = 0;
         right.y = 0;
         forward.Normalize();
         right.Normalize();
 
-        // Combine input with camera's direction
         if (Input.GetKey(KeyCode.W)) moveDirection += forward;
         if (Input.GetKey(KeyCode.S)) moveDirection -= forward;
         if (Input.GetKey(KeyCode.D)) moveDirection += right;
@@ -219,31 +216,24 @@ public class CharacterMovement : MonoBehaviour
 
         moveDirection.Normalize();
 
-        // Rotate the character to face the movement direction
         if (moveDirection != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
 
-        // Apply movement speed from StatModifier
         controller.Move(moveDirection * (statModifier.currentMovementSpeed * speedMultiplier) * Time.deltaTime);
-
-        // Notify the animation script of movement states
         characterAnimation.UpdateAnimationStates(isWalking, isRunning, isJumping);
     }
 
     private IEnumerator JumpWithDelay()
     {
-        // Trigger jump animation and wait for delay
         characterAnimation.TriggerJump();
         yield return new WaitForSeconds(jumpDelay);
 
-        // Apply jump force
         isJumping = true;
         velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
-        // Reset the jump initiation flag
         jumpInitiated = false;
     }
 
@@ -256,12 +246,138 @@ public class CharacterMovement : MonoBehaviour
         }
         else if (controller.isGrounded && isJumping)
         {
-            // Reset jump state when grounded
             isJumping = false;
             velocity.y = 0f;
         }
     }
+
+    void HandleAttackInput()
+    {
+        if (Input.GetMouseButtonDown(0) && !isAttacking)
+        {
+            isAttacking = true;  // Set the flag to prevent additional attacks
+            currentAttackIndex = (currentAttackIndex % 3) + 1; // Cycle through attack animations
+            characterAnimation.TriggerAttackAnimation(currentAttackIndex);
+
+            // Start a coroutine to reset the flag after the animation
+            StartCoroutine(ResetAttackFlag());
+        }
+    }
+
+    private IEnumerator ResetAttackFlag()
+    {
+        // Wait for the duration of the attack animation or set a custom cooldown if needed
+        yield return new WaitForSeconds(0.5f); // Adjust this delay to match the animation length
+        isAttacking = false;  // Reset the flag to allow another attack
+    }
 }
+
+//kinda recent update script
+//public class CharacterMovement : MonoBehaviour
+//{
+//    public StatModifier statModifier; // Reference to StatModifier
+//    public CharacterAnimation characterAnimation; // Reference to the animation script
+//    public Transform cameraTransform; // Reference to the camera
+//    public float gravity = -9.81f;
+//    public float jumpHeight = 3f; // Set the jump height
+//    public float jumpDelay = 0.2f; // Delay before jumping
+
+//    private CharacterController controller;
+//    private Vector3 velocity;
+//    private bool isJumping = false;
+//    private bool jumpInitiated = false;
+
+//    void Start()
+//    {
+//        controller = GetComponent<CharacterController>();
+//    }
+
+//    void Update()
+//    {
+//        HandleMovementInput();
+//        ApplyGravity();
+//    }
+
+//    void HandleMovementInput()
+//    {
+//        // Check if character is walking or running
+//        bool isWalking = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) ||
+//                         Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
+//        bool isRunning = isWalking && Input.GetKey(KeyCode.LeftShift);
+//        bool jumpPressed = Input.GetKeyDown(KeyCode.Space) && controller.isGrounded && !jumpInitiated;
+
+//        // Start jump coroutine if space is pressed and the player is grounded
+//        if (jumpPressed)
+//        {
+//            jumpInitiated = true;
+//            StartCoroutine(JumpWithDelay());
+//        }
+
+//        // Adjust speed for running if shift is held
+//        float speedMultiplier = isRunning ? 1.5f : 1f;
+//        Vector3 moveDirection = Vector3.zero;
+
+//        // Get input and convert it relative to camera direction
+//        Vector3 forward = cameraTransform.forward;
+//        Vector3 right = cameraTransform.right;
+
+//        // Flatten the forward and right vectors on the Y-axis
+//        forward.y = 0;
+//        right.y = 0;
+//        forward.Normalize();
+//        right.Normalize();
+
+//        // Combine input with camera's direction
+//        if (Input.GetKey(KeyCode.W)) moveDirection += forward;
+//        if (Input.GetKey(KeyCode.S)) moveDirection -= forward;
+//        if (Input.GetKey(KeyCode.D)) moveDirection += right;
+//        if (Input.GetKey(KeyCode.A)) moveDirection -= right;
+
+//        moveDirection.Normalize();
+
+//        // Rotate the character to face the movement direction
+//        if (moveDirection != Vector3.zero)
+//        {
+//            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+//            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+//        }
+
+//        // Apply movement speed from StatModifier
+//        controller.Move(moveDirection * (statModifier.currentMovementSpeed * speedMultiplier) * Time.deltaTime);
+
+//        // Notify the animation script of movement states
+//        characterAnimation.UpdateAnimationStates(isWalking, isRunning, isJumping);
+//    }
+
+//    private IEnumerator JumpWithDelay()
+//    {
+//        // Trigger jump animation and wait for delay
+//        characterAnimation.TriggerJump();
+//        yield return new WaitForSeconds(jumpDelay);
+
+//        // Apply jump force
+//        isJumping = true;
+//        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+//        // Reset the jump initiation flag
+//        jumpInitiated = false;
+//    }
+
+//    void ApplyGravity()
+//    {
+//        if (!controller.isGrounded)
+//        {
+//            velocity.y += gravity * Time.deltaTime;
+//            controller.Move(velocity * Time.deltaTime);
+//        }
+//        else if (controller.isGrounded && isJumping)
+//        {
+//            // Reset jump state when grounded
+//            isJumping = false;
+//            velocity.y = 0f;
+//        }
+//    }
+//}
 
 
 //working jump and script

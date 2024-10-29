@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class SwordHitbox : MonoBehaviour
 {
-    public int baseDamage = 10;  // Base damage for each hit
-    public StatModifier statModifier; // Reference to StatModifier for attack speed and other stats
+    public StatModifier statModifier; // Reference to StatModifier for player's stats
+    public GameObject damageTextPrefab; // Reference to the Damage Text prefab
     private Collider swordCollider;
 
     private void Start()
@@ -30,11 +31,30 @@ public class SwordHitbox : MonoBehaviour
     {
         // Check if the collider belongs to an EnemyAI
         EnemyAI enemy = other.GetComponent<EnemyAI>();
-        if (enemy != null)
+        if (enemy != null && statModifier != null)
         {
-            // Calculate damage based on stats (modify if needed)
-            int finalDamage = baseDamage;
+            // Use player's currentAttack from StatModifier for damage
+            int finalDamage = statModifier.currentAttack;
             enemy.TakeDamage(finalDamage);
+
+            // Spawn damage text
+            ShowDamageText(finalDamage, other.transform.position);
+        }
+    }
+
+    private void ShowDamageText(int damage, Vector3 position)
+    {
+        if (damageTextPrefab != null)
+        {
+            // Instantiate the damage text prefab at the hit position
+            GameObject damageTextInstance = Instantiate(damageTextPrefab, position, Quaternion.identity);
+
+            // Set the text to display the damage amount
+            TextMeshPro textMesh = damageTextInstance.GetComponentInChildren<TextMeshPro>();
+            if (textMesh != null)
+            {
+                textMesh.text = damage.ToString();
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class PlayerStatDisplay : MonoBehaviour
 {
     public StatModifier statModifier;
+    public TextMeshProUGUI healthText;
 
     [Header("UI Elements")]
     public GameObject statPanel;
@@ -107,7 +108,38 @@ public class PlayerStatDisplay : MonoBehaviour
         }
         ApplyStats();
     }
+    public void TakeDamage(int damage)
+    {
+        if (statModifier != null)
+        {
+            // Reduce the player's current HP
+            statModifier.currentHP -= damage;
 
+            // Clamp the HP to ensure it doesn’t go below zero
+            statModifier.currentHP = Mathf.Max(statModifier.currentHP, 0);
+
+            // Update the health UI to reflect the new HP
+            UpdateHealthUI();
+
+            // Check if the player has died
+            if (statModifier.currentHP <= 0)
+            {
+                HandlePlayerDeath();
+            }
+        }
+    }
+    private void UpdateHealthUI()
+    {
+        if (healthText != null)
+        {
+            healthText.text = $"HP: {statModifier.currentHP} / {statModifier.baseHP}";
+        }
+    }
+    private void HandlePlayerDeath()
+    {
+        Debug.Log("Player has died!");
+        // You can add additional logic here, like triggering a death animation or restarting the level
+    }
     private void ApplyStats()
     {
         statModifier.ApplyPoints(vitalityPoints, strengthPoints, agilityPoints, dexterityPoints);

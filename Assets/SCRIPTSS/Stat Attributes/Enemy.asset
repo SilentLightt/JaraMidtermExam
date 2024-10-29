@@ -16,13 +16,13 @@ MonoBehaviour:
   baseMovementSpeed: 1
   baseAttackSpeed: 0.25
   baseAttack: 1
-  baseHitchance: 20
+  baseHitchance: 100
   baseCritChance: 5
   baseArmor: 1
   baseCritDamage: 10
   baseScale: {x: 1, y: 1, z: 1}
   points: 30
-  currentHP: 100
+  currentHP: 89
   currentMovementSpeed: 1
   currentAttackSpeed: 0.25
   currentAttack: 1

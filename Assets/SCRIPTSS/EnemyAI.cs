@@ -18,6 +18,11 @@ public class EnemyAI : MonoBehaviour
     public Transform damageTextSpawnPoint; // Assign this to the desired location on the enemy, e.g., head or chest
     public TextMeshProUGUI healthText; // Reference to TextMeshPro component for displaying health
 
+    private PlayerStatDisplay playerStatDisplay; // Reference to PlayerStatDisplay
+
+    private float attackRandomizationCooldown = 1.5f; // Cooldown in seconds before selecting a new attack
+    private float attackCooldownTimer = 0f; // Timer to track cooldown
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -29,8 +34,10 @@ public class EnemyAI : MonoBehaviour
         }
 
         // Get reference to the Enemy script on this GameObject
-        enemyScript = GetComponent<Enemy>();
+        playerStatDisplay = FindObjectOfType<PlayerStatDisplay>();
 
+        // Get reference to the Enemy script on this GameObject
+        enemyScript = GetComponent<Enemy>();
         // Find the player in the scene
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
@@ -99,6 +106,26 @@ public class EnemyAI : MonoBehaviour
         hasAttacked = true;
         animator.SetTrigger("Attack");
         Invoke(nameof(ResetAttack), 1.0f);
+        int damage = statModifier.currentAttack; // Enemy's attack damage
+        playerStatDisplay.TakeDamage(damage);
+        //if (playerStatDisplay != null && !hasAttacked)
+        //{
+        //    hasAttacked = true;
+
+        //    int damage = statModifier.currentAttack; // Enemy's attack damage
+
+        //    // Apply damage to the player
+        //    playerStatDisplay.TakeDamage(damage);
+
+        //    // Set a random attack type (e.g., between 1 and 3 for 3 different attack animations)
+        //    int randomAttackType = Random.Range(1, 4); // Adjust the range based on the number of attack animations
+        //    animator.SetInteger("AttackType", randomAttackType);
+
+        //    // Log the attack event with the selected attack type
+        //    Debug.Log($"Enemy attacked player with AttackType {randomAttackType} for {damage} damage. Player's current health: {playerStatDisplay.statModifier.currentHP}");
+
+        //    Invoke(nameof(ResetAttack), 1.0f); // Adjust cooldown as needed
+        //}
     }
 
     private void ResetAttack()

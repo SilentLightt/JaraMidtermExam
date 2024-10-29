@@ -24558,6 +24558,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   statModifier: {fileID: 11400000, guid: b270930e883c8ed49bd772f8cc4e5955, type: 2}
+  healthText: {fileID: 7256852595189308659}
   statPanel: {fileID: 366034352748617032}
   openButton: {fileID: 1833208872}
   closeButton: {fileID: 4550925581486717648}
@@ -25765,6 +25766,7 @@ MonoBehaviour:
   statModifier: {fileID: 11400000, guid: be07fde1092f292499fdd25fadca8d5c, type: 2}
   damageTextSpawnPoint: {fileID: 319467039}
   healthText: {fileID: 3345478616750068206}
+  playerStatDisplay: {fileID: 1221316315952298926}
 --- !u!4 &1597655858184284419
 Transform:
   m_ObjectHideFlags: 0

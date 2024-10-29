@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4796154851664498945
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7967122956804437370}
+  - component: {fileID: 2516499972525349025}
+  m_Layer: 0
+  m_Name: StatDisplayManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7967122956804437370
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4796154851664498945}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2093.5183, y: 1493.8035, z: -12.585836}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2516499972525349025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4796154851664498945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dc72d7f8f69aaf4aa4cf32f89fce892, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statModifier: {fileID: 11400000, guid: b270930e883c8ed49bd772f8cc4e5955, type: 2}
+  statPanel: {fileID: 0}
+  openButton: {fileID: 0}
+  closeButton: {fileID: 0}
+  vitalityText: {fileID: 0}
+  strengthText: {fileID: 0}
+  agilityText: {fileID: 0}
+  dexterityText: {fileID: 0}
+  pointsText: {fileID: 0}
+  hpText: {fileID: 0}
+  movementSpeedText: {fileID: 0}
+  attackSpeedText: {fileID: 0}
+  attackText: {fileID: 0}
+  hitchanceText: {fileID: 0}
+  critChanceText: {fileID: 0}
+  armorText: {fileID: 0}
+  critDamageText: {fileID: 0}
+  scaleText: {fileID: 0}

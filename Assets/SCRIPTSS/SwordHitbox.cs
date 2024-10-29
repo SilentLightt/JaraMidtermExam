@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,12 +10,12 @@ public class SwordHitbox : MonoBehaviour
     public GameObject damageTextPrefab; // Reference to the Damage Text prefab
     public float raycastRange = 2.0f; // Range of the sword attack raycast
     public Transform raycastOrigin; // Assign in Inspector or initialize with sword tip
-    private Camera mainCamera;
+    public CinemachineVirtualCamera mainCamera;
 
     private void Start()
     {
         // Find the main camera only once for efficiency
-        mainCamera = Camera.main;
+       // mainCamera = Camera.main;
     }
 
     private void LateUpdate()
@@ -41,7 +42,7 @@ public class SwordHitbox : MonoBehaviour
             if (enemy != null && statModifier != null)
             {
                 int finalDamage;
-                string attackType;
+                string attackText;
                 Color textColor;
 
                 // Determine if the attack is a critical hit, a miss, or a normal hit
@@ -51,14 +52,14 @@ public class SwordHitbox : MonoBehaviour
                     {
                         // Critical Hit
                         finalDamage = Mathf.RoundToInt(statModifier.currentAttack * (1 + statModifier.currentCritDamage / 100f));
-                        attackType = "Critical Hit!";
+                        attackText = $"Critical!: {finalDamage}";
                         textColor = Color.red; // Critical Attack - Red Text
                     }
                     else
                     {
                         // Normal Hit
                         finalDamage = statModifier.currentAttack;
-                        attackType = "Normal Hit";
+                        attackText = $" {finalDamage}";
                         textColor = Color.white; // Normal Attack - White Text
                     }
                 }
@@ -66,7 +67,7 @@ public class SwordHitbox : MonoBehaviour
                 {
                     // Miss
                     finalDamage = 0;
-                    attackType = "Missed!";
+                    attackText = "Missed!";
                     textColor = Color.blue; // Miss Attack - Blue Text
                 }
 
@@ -76,8 +77,8 @@ public class SwordHitbox : MonoBehaviour
                     enemy.TakeDamage(finalDamage);
                 }
 
-                // Show the attack type text at the hit point
-                ShowDamageText(attackType, hit.point, textColor);
+                // Show the attack type and damage text at the hit point
+                ShowDamageText(attackText, hit.point, textColor);
             }
             else
             {
@@ -97,15 +98,96 @@ public class SwordHitbox : MonoBehaviour
             // Instantiate the damage text prefab at the specified position
             GameObject damageTextInstance = Instantiate(damageTextPrefab, position, Quaternion.identity);
 
-            // Set the text to display the damage amount
+            // Set the text to display the damage amount and color based on attack type
             TextMeshPro textMesh = damageTextInstance.GetComponentInChildren<TextMeshPro>();
             if (textMesh != null)
             {
                 textMesh.text = text;
-                textMesh.color = textColor; // Set the color based on attack type
+                textMesh.color = textColor;
             }
         }
     }
+    //private void PerformRaycastAttack()
+    //{
+    //    // Define the starting position and direction of the raycast
+    //    Vector3 rayOrigin = transform.position;
+    //    Vector3 rayDirection = transform.forward;
+
+    //    // Perform the raycast
+    //    if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, raycastRange))
+    //    {
+    //        Debug.Log("Raycast hit: " + hit.collider.name);
+
+    //        // Check if the object hit has the EnemyAI component
+    //        EnemyAI enemy = hit.collider.GetComponent<EnemyAI>();
+    //        if (enemy != null && statModifier != null)
+    //        {
+    //            int finalDamage;
+    //            string attackType;
+    //            Color textColor;
+
+    //            // Determine if the attack is a critical hit, a miss, or a normal hit
+    //            if (Random.Range(0f, 100f) <= statModifier.currentHitchance)
+    //            {
+    //                if (Random.Range(0f, 100f) <= statModifier.currentCritChance)
+    //                {
+    //                    // Critical Hit
+    //                    finalDamage = Mathf.RoundToInt(statModifier.currentAttack * (1 + statModifier.currentCritDamage / 100f));
+    //                    attackType = $"Critical Hit: {finalDamage}";
+    //                    textColor = Color.red; // Critical Attack - Red Text
+    //                }
+    //                else
+    //                {
+    //                    // Normal Hit
+    //                    finalDamage = statModifier.currentAttack;
+    //                    attackType = $"Normal Hit: {finalDamage}";
+    //                    textColor = Color.white; // Normal Attack - White Text
+    //                }
+    //            }
+    //            else
+    //            {
+    //                // Miss
+    //                finalDamage = 0;
+    //                attackType = "Missed!";
+    //                textColor = Color.blue; // Miss Attack - Blue Text
+    //            }
+
+    //            // Apply damage to the enemy if it’s not a miss
+    //            if (finalDamage > 0)
+    //            {
+    //                enemy.TakeDamage(finalDamage);
+    //            }
+
+    //            // Show the attack type text at the hit point
+    //            ShowDamageText(attackType, hit.point, textColor);
+    //        }
+    //        else
+    //        {
+    //            Debug.Log("Raycast hit a non-enemy object: " + hit.collider.name);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("Raycast did not hit any objects.");
+    //    }
+    //}
+
+    //private void ShowDamageText(string text, Vector3 position, Color textColor)
+    //{
+    //    if (damageTextPrefab != null)
+    //    {
+    //        // Instantiate the damage text prefab at the specified position
+    //        GameObject damageTextInstance = Instantiate(damageTextPrefab, position, Quaternion.identity);
+
+    //        // Set the text to display the damage amount
+    //        TextMeshPro textMesh = damageTextInstance.GetComponentInChildren<TextMeshPro>();
+    //        if (textMesh != null)
+    //        {
+    //            textMesh.text = text;
+    //            textMesh.color = textColor; // Set the color based on attack type
+    //        }
+    //    }
+    //}
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

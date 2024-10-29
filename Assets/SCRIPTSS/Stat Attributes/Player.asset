@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Player
   m_EditorClassIdentifier: 
   baseHP: 100
-  baseMovementSpeed: 1.5
-  baseAttackSpeed: 1.5
+  baseMovementSpeed: 3
+  baseAttackSpeed: 3
   baseAttack: 5
   baseHitchance: 20
   baseCritChance: 5
@@ -23,11 +23,11 @@ MonoBehaviour:
   baseScale: {x: 1, y: 1, z: 1}
   points: 30
   currentHP: 100
-  currentMovementSpeed: 1.5
-  currentAttackSpeed: 1.5
-  currentAttack: 1
+  currentMovementSpeed: 3
+  currentAttackSpeed: 3
+  currentAttack: 5
   currentHitchance: 20
   currentCritChance: 5
-  currentArmor: 11
-  currentCritDamage: 1
+  currentArmor: 5
+  currentCritDamage: 10
   currentScale: {x: 1, y: 1, z: 1}

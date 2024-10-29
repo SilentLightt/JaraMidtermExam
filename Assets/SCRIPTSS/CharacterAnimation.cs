@@ -5,6 +5,7 @@ using UnityEngine;
 public class CharacterAnimation : MonoBehaviour
 {
     public Animator animator;
+    public StatModifier statModifier; // Reference to StatModifier for attack speed
     public int idleVariants = 2;
 
     private void Start()
@@ -35,14 +36,19 @@ public class CharacterAnimation : MonoBehaviour
         }
     }
 
-    //public void SetAttackType(int attackType)
-    //{
-    //    animator.SetInteger("AttackType", attackType); // Set the chosen attack type
-    //}
-    //public void TriggerAttackAnimation()
-    //{
-    //    animator.SetTrigger("Attack");
-    //}
+    public void SetAttackSpeed()
+    {
+        // Update the animator speed based on currentAttackSpeed from StatModifier
+        animator.SetFloat("AttackSpeedMultiplier", statModifier.currentAttackSpeed);
+    }
+
+    public void TriggerAttackAnimation(int attackType)
+    {
+        SetAttackSpeed(); // Ensure the attack speed is updated
+        animator.SetInteger("AttackType", attackType);
+        animator.SetTrigger("Attack");
+    }
+
     public void TriggerJump()
     {
         animator.SetTrigger("Jump");

@@ -45,7 +45,7 @@ public class CharacterAnimation : MonoBehaviour
     public void TriggerAttackAnimation(int attackType)
     {
         SetAttackSpeed(); // Ensure the attack speed is updated
-        animator.SetInteger("AttackType", attackType);
+       // animator.SetInteger("AttackType", attackType);
         animator.SetTrigger("Attack");
     }
 

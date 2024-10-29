@@ -143,7 +143,7 @@ public class EnemyAI : MonoBehaviour
         animator.SetTrigger("Die");
         agent.isStopped = true;
         this.enabled = false;
-        Destroy(gameObject, 3f); // Delays destruction to allow death animation to play
+        Destroy(gameObject, 5f); // Delays destruction to allow death animation to play
     }
 
     private void OnDrawGizmosSelected()

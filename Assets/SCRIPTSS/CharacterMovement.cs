@@ -159,19 +159,19 @@ using UnityEngine;
 
 public class CharacterMovement : MonoBehaviour
 {
-    public StatModifier statModifier; // Reference to StatModifier
-    public CharacterAnimation characterAnimation; // Reference to the animation script
-    public Transform cameraTransform; // Reference to the camera
+    public StatModifier statModifier;
+    public CharacterAnimation characterAnimation;
+    public Transform cameraTransform;
     public float gravity = -9.81f;
-    public float jumpHeight = 3f; // Set the jump height
-    public float jumpDelay = 0.2f; // Delay before jumping
+    public float jumpHeight = 3f;
+    public float jumpDelay = 0.2f;
 
     private CharacterController controller;
     private Vector3 velocity;
     private bool isJumping = false;
     private bool jumpInitiated = false;
-    private int currentAttackIndex = 0; // Track which attack animation to play
-    private bool isAttacking = false;   // Flag to prevent spamming attacks
+    private int currentAttackIndex = 0;
+    private bool isAttacking = false;
 
     void Start()
     {
@@ -180,14 +180,22 @@ public class CharacterMovement : MonoBehaviour
 
     void Update()
     {
-        HandleMovementInput();
-        ApplyGravity();
-        HandleAttackInput(); // New method for attack input
+        // Only handle movement if the stat panel is not open
+        if (!PlayerStatDisplay.isStatPanelOpen)
+        {
+            HandleMovementInput();
+            ApplyGravity();
+            HandleAttackInput();
+        }
+        if (statModifier != null)
+        {
+            transform.localScale = statModifier.currentScale;
+
+        }
     }
 
     void HandleMovementInput()
     {
-        // Movement and running logic (unchanged)
         bool isWalking = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) ||
                          Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
         bool isRunning = isWalking && Input.GetKey(KeyCode.LeftShift);
@@ -233,7 +241,6 @@ public class CharacterMovement : MonoBehaviour
 
         isJumping = true;
         velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-
         jumpInitiated = false;
     }
 
@@ -255,20 +262,23 @@ public class CharacterMovement : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && !isAttacking)
         {
-            isAttacking = true;  // Set the flag to prevent additional attacks
-            currentAttackIndex = (currentAttackIndex % 3) + 1; // Cycle through attack animations
+            isAttacking = true;
+            //currentAttackIndex = (currentAttackIndex % 3) + 1;
             characterAnimation.TriggerAttackAnimation(currentAttackIndex);
-
-            // Start a coroutine to reset the flag after the animation
+            // Trigger the sword attack
+            SwordHitbox swordHitbox = GetComponentInChildren<SwordHitbox>(); // Assuming SwordHitbox is a child
+            if (swordHitbox != null)
+            {
+                swordHitbox.Attack();
+            }
             StartCoroutine(ResetAttackFlag());
         }
     }
 
     private IEnumerator ResetAttackFlag()
     {
-        // Wait for the duration of the attack animation or set a custom cooldown if needed
-        yield return new WaitForSeconds(0.5f); // Adjust this delay to match the animation length
-        isAttacking = false;  // Reset the flag to allow another attack
+        yield return new WaitForSeconds(0.5f);
+        isAttacking = false;
     }
 }
 

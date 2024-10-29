@@ -8,7 +8,23 @@ public class SwordHitbox : MonoBehaviour
     public StatModifier statModifier; // Reference to StatModifier for player's stats
     public GameObject damageTextPrefab; // Reference to the Damage Text prefab
     public float raycastRange = 2.0f; // Range of the sword attack raycast
+    public Transform raycastOrigin; // Assign in Inspector or initialize with sword tip
+    private Camera mainCamera;
 
+    private void Start()
+    {
+        // Find the main camera only once for efficiency
+        mainCamera = Camera.main;
+    }
+
+    private void LateUpdate()
+    {
+        // Make the text face the camera
+        if (mainCamera != null)
+        {
+            transform.LookAt(transform.position + mainCamera.transform.forward);
+        }
+    }
     private void PerformRaycastAttack()
     {
         // Define the starting position and direction of the raycast
@@ -18,20 +34,50 @@ public class SwordHitbox : MonoBehaviour
         // Perform the raycast
         if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, raycastRange))
         {
-            Debug.Log("Raycast hit: " + hit.collider.name); // Log the object hit by the raycast
+            Debug.Log("Raycast hit: " + hit.collider.name);
 
             // Check if the object hit has the EnemyAI component
             EnemyAI enemy = hit.collider.GetComponent<EnemyAI>();
             if (enemy != null && statModifier != null)
             {
-                Debug.Log("Enemy detected via raycast: " + hit.collider.name + ". Applying damage.");
+                int finalDamage;
+                string attackType;
+                Color textColor;
 
-                // Use player's currentAttack from StatModifier for damage
-                int finalDamage = statModifier.currentAttack;
-                enemy.TakeDamage(finalDamage);
+                // Determine if the attack is a critical hit, a miss, or a normal hit
+                if (Random.Range(0f, 100f) <= statModifier.currentHitchance)
+                {
+                    if (Random.Range(0f, 100f) <= statModifier.currentCritChance)
+                    {
+                        // Critical Hit
+                        finalDamage = Mathf.RoundToInt(statModifier.currentAttack * (1 + statModifier.currentCritDamage / 100f));
+                        attackType = "Critical Hit!";
+                        textColor = Color.red; // Critical Attack - Red Text
+                    }
+                    else
+                    {
+                        // Normal Hit
+                        finalDamage = statModifier.currentAttack;
+                        attackType = "Normal Hit";
+                        textColor = Color.white; // Normal Attack - White Text
+                    }
+                }
+                else
+                {
+                    // Miss
+                    finalDamage = 0;
+                    attackType = "Missed!";
+                    textColor = Color.blue; // Miss Attack - Blue Text
+                }
 
-                // Spawn damage text at the hit point
-                ShowDamageText(finalDamage, hit.point);
+                // Apply damage to the enemy if it’s not a miss
+                if (finalDamage > 0)
+                {
+                    enemy.TakeDamage(finalDamage);
+                }
+
+                // Show the attack type text at the hit point
+                ShowDamageText(attackType, hit.point, textColor);
             }
             else
             {
@@ -44,7 +90,7 @@ public class SwordHitbox : MonoBehaviour
         }
     }
 
-    private void ShowDamageText(int damage, Vector3 position)
+    private void ShowDamageText(string text, Vector3 position, Color textColor)
     {
         if (damageTextPrefab != null)
         {
@@ -55,7 +101,8 @@ public class SwordHitbox : MonoBehaviour
             TextMeshPro textMesh = damageTextInstance.GetComponentInChildren<TextMeshPro>();
             if (textMesh != null)
             {
-                textMesh.text = damage.ToString();
+                textMesh.text = text;
+                textMesh.color = textColor; // Set the color based on attack type
             }
         }
     }
@@ -72,6 +119,8 @@ public class SwordHitbox : MonoBehaviour
     // Method to be called when the player performs an attack (triggered by input or animation)
     public void Attack()
     {
+        Vector3 rayOrigin = raycastOrigin != null ? raycastOrigin.position : transform.position;
+        Vector3 rayDirection = transform.forward;
         PerformRaycastAttack();
     }
     //public StatModifier statModifier; // Reference to StatModifier for player's stats

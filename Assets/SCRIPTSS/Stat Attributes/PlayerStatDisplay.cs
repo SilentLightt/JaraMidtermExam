@@ -34,6 +34,7 @@ public class PlayerStatDisplay : MonoBehaviour
     private int dexterityPoints = 0;
 
     private int remainingPoints;
+    public static bool isStatPanelOpen { get; private set; } // Static flag to track if the panel is open
 
     private void Start()
     {
@@ -44,6 +45,7 @@ public class PlayerStatDisplay : MonoBehaviour
         closeButton.onClick.AddListener(CloseStatPanel);
 
         statPanel.SetActive(false);
+        isStatPanelOpen = false; // Ensure it starts as closed
     }
 
     public void OpenStatPanel()
@@ -51,7 +53,8 @@ public class PlayerStatDisplay : MonoBehaviour
         statPanel.SetActive(true);
         openButton.gameObject.SetActive(false);
         closeButton.gameObject.SetActive(true);
-        UpdateUI(); // Update UI whenever panel opens
+        isStatPanelOpen = true; // Set the flag to true when the panel opens
+        UpdateUI();
     }
 
     public void CloseStatPanel()
@@ -59,6 +62,7 @@ public class PlayerStatDisplay : MonoBehaviour
         statPanel.SetActive(false);
         openButton.gameObject.SetActive(true);
         closeButton.gameObject.SetActive(false);
+        isStatPanelOpen = false; // Set the flag to false when the panel closes
     }
 
     public void IncreaseStat(string stat)
@@ -120,7 +124,6 @@ public class PlayerStatDisplay : MonoBehaviour
 
         hpText.text = "HP: " + statModifier.currentHP;
 
-        // Display movement speed and attack speed as percentages
         float movementSpeedPercentage = statModifier.currentMovementSpeed * 100f;
         float attackSpeedPercentage = statModifier.currentAttackSpeed * 100f;
 

@@ -45,9 +45,9 @@ public class StatModifier : ScriptableObject
         currentCritDamage = baseCritDamage;
         currentScale = baseScale;
     }
-
     public void ApplyPoints(int vitalityPoints, int strPoints, int agiPoints, int dexPoints)
     {
+        // Reset stats before applying new modifications
         ResetStats();
 
         // VITALITY Modifiers
@@ -55,19 +55,24 @@ public class StatModifier : ScriptableObject
         currentAttack += vitalityPoints * 3;
         currentCritChance = Mathf.Max(1f, currentCritChance - (vitalityPoints * 3f));
 
-        // STR Modifiers
+        // STR Modifiers - Increase scale on X, Y, and Z based on STR
         currentHP += strPoints * 5;
         currentAttack += strPoints * 3;
+        currentScale.x += strPoints * 0.1f;
         currentScale.y += strPoints * 0.1f;
+        currentScale.z += strPoints * 0.1f;
+        currentMovementSpeed = Mathf.Max(1f, currentMovementSpeed - (strPoints * 1f));
+        currentAttackSpeed = Mathf.Max(1f, currentAttackSpeed - (strPoints * 1f));
 
-        // Adjust movement and attack speeds by flat percentages for AGI
-        currentMovementSpeed += agiPoints * 0.03f; // Increases by 3% per AGI point
-        currentAttackSpeed += agiPoints * 0.03f;   // Increases by 3% per AGI point
-
-        // AGI Modifiers
+        // AGI Modifiers - Decrease scale on X, Y, and Z based on AGI
         currentArmor += Mathf.FloorToInt(agiPoints * 0.2f);
+        currentMovementSpeed += agiPoints * 3f;
+        currentScale.x = Mathf.Max(0.5f, currentScale.x - (agiPoints * 0.05f));
+        currentScale.y = Mathf.Max(0.5f, currentScale.y - (agiPoints * 0.05f));
+        currentScale.z = Mathf.Max(0.5f, currentScale.z - (agiPoints * 0.05f));
         currentCritDamage = Mathf.Max(1f, currentCritDamage - (agiPoints * 1f));
         currentAttack = Mathf.Max(1, currentAttack - (agiPoints * 2));
+        currentAttackSpeed += agiPoints * 3f;
 
         // DEX Modifiers
         currentCritDamage += dexPoints * 3f;
@@ -75,6 +80,35 @@ public class StatModifier : ScriptableObject
         currentCritChance += dexPoints * 5f;
     }
 }
+    //public void ApplyPoints(int vitalityPoints, int strPoints, int agiPoints, int dexPoints)
+    //{
+    //    ResetStats();
+
+    //    // VITALITY Modifiers
+    //    currentHP += vitalityPoints * 15;
+    //    currentAttack += vitalityPoints * 3;
+    //    currentCritChance = Mathf.Max(1f, currentCritChance - (vitalityPoints * 3f));
+
+    //    // STR Modifiers
+    //    currentHP += strPoints * 5;
+    //    currentAttack += strPoints * 3;
+    //    currentScale.y += strPoints * 0.1f;
+
+    //    // Adjust movement and attack speeds by flat percentages for AGI
+    //    currentMovementSpeed += agiPoints * 0.03f; // Increases by 3% per AGI point
+    //    currentAttackSpeed += agiPoints * 0.03f;   // Increases by 3% per AGI point
+
+    //    // AGI Modifiers
+    //    currentArmor += Mathf.FloorToInt(agiPoints * 0.2f);
+    //    currentCritDamage = Mathf.Max(1f, currentCritDamage - (agiPoints * 1f));
+    //    currentAttack = Mathf.Max(1, currentAttack - (agiPoints * 2));
+
+    //    // DEX Modifiers
+    //    currentCritDamage += dexPoints * 3f;
+    //    currentHitchance += dexPoints * 5f;
+    //    currentCritChance += dexPoints * 5f;
+    //}
+    //}
 
 //whole number speed script
 //public class StatModifier : ScriptableObject
